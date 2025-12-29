@@ -1,0 +1,20 @@
+[project]
+name = "todo1"
+version = "0.1.0"
+description = "Dev-Ops Ticket Management CLI"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.12.5",
+    "rich>=14.2.0",
+    "typer>=0.21.0",
+]
+
+[project.scripts]
+todo = "src.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+]
