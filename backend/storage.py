@@ -1,39 +1,39 @@
-"""In-memory ticket storage manager."""
+"""Database session management for Neon PostgreSQL."""
 
-from typing import Dict, List, Optional
-from backend.models import Ticket, Priority, Status
+from typing import List, Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
+
+from backend.models import Ticket, TicketCreate, TicketUpdate, Status, Priority
 
 
 class TicketStorage:
-    """Manages tickets in memory."""
+    """Manages tickets using Neon PostgreSQL database."""
 
-    def __init__(self):
-        """Initialize empty ticket storage."""
-        self._tickets: Dict[int, Ticket] = {}
-        self._next_id: int = 1
-
-    def create(self, title: str, priority: Priority = Priority.MED, status: Status = Status.BACKLOG) -> Ticket:
-        """Create a new ticket.
+    def __init__(self, session: AsyncSession):
+        """Initialize storage with database session.
 
         Args:
-            title: Ticket title
-            priority: Ticket priority (default: MED)
-            status: Ticket status (default: BACKLOG)
+            session: SQLAlchemy async session
+        """
+        self.session = session
+
+    async def create(self, ticket_data: TicketCreate) -> Ticket:
+        """Create a new ticket in database.
+
+        Args:
+            ticket_data: Ticket data to create
 
         Returns:
             Created ticket
         """
-        ticket = Ticket(
-            id=self._next_id,
-            title=title,
-            priority=priority,
-            status=status
-        )
-        self._tickets[self._next_id] = ticket
-        self._next_id += 1
-        return ticket
+        db_ticket = Ticket.model_validate(ticket_data)
+        self.session.add(db_ticket)
+        await self.session.commit()
+        await self.session.refresh(db_ticket)
+        return db_ticket
 
-    def get(self, ticket_id: int) -> Optional[Ticket]:
+    async def get(self, ticket_id: int) -> Optional[Ticket]:
         """Get a ticket by ID.
 
         Args:
@@ -42,17 +42,58 @@ class TicketStorage:
         Returns:
             Ticket if found, None otherwise
         """
-        return self._tickets.get(ticket_id)
+        statement = select(Ticket).where(Ticket.id == ticket_id)
+        result = await self.session.exec(statement)
+        return result.first()
 
-    def list_all(self) -> List[Ticket]:
-        """List all tickets.
+    async def list_all(self, status: Optional[Status] = None, priority: Optional[Priority] = None) -> List[Ticket]:
+        """List all tickets with optional filtering.
+
+        Args:
+            status: Filter by status (optional)
+            priority: Filter by priority (optional)
 
         Returns:
-            List of all tickets
+            List of tickets
         """
-        return list(self._tickets.values())
+        statement = select(Ticket)
 
-    def update_status(self, ticket_id: int, status: Status) -> Optional[Ticket]:
+        if status:
+            statement = statement.where(Ticket.status == status)
+        if priority:
+            statement = statement.where(Ticket.priority == priority)
+
+        statement = statement.order_by(Ticket.created_at.desc())
+
+        result = await self.session.exec(statement)
+        return list(result.all())
+
+    async def update(self, ticket_id: int, ticket_data: TicketUpdate) -> Optional[Ticket]:
+        """Update a ticket.
+
+        Args:
+            ticket_id: Ticket ID
+            ticket_data: Data to update
+
+        Returns:
+            Updated ticket if found, None otherwise
+        """
+        statement = select(Ticket).where(Ticket.id == ticket_id)
+        result = await self.session.exec(statement)
+        ticket = result.first()
+
+        if ticket:
+            update_data = ticket_data.model_dump(exclude_unset=True)
+            for field, value in update_data.items():
+                setattr(ticket, field, value)
+
+            self.session.add(ticket)
+            await self.session.commit()
+            await self.session.refresh(ticket)
+
+        return ticket
+
+    async def update_status(self, ticket_id: int, status: Status) -> Optional[Ticket]:
         """Update ticket status.
 
         Args:
@@ -62,12 +103,19 @@ class TicketStorage:
         Returns:
             Updated ticket if found, None otherwise
         """
-        ticket = self._tickets.get(ticket_id)
+        statement = select(Ticket).where(Ticket.id == ticket_id)
+        result = await self.session.exec(statement)
+        ticket = result.first()
+
         if ticket:
             ticket.status = status
+            self.session.add(ticket)
+            await self.session.commit()
+            await self.session.refresh(ticket)
+
         return ticket
 
-    def update_priority(self, ticket_id: int, priority: Priority) -> Optional[Ticket]:
+    async def update_priority(self, ticket_id: int, priority: Priority) -> Optional[Ticket]:
         """Update ticket priority.
 
         Args:
@@ -77,12 +125,19 @@ class TicketStorage:
         Returns:
             Updated ticket if found, None otherwise
         """
-        ticket = self._tickets.get(ticket_id)
+        statement = select(Ticket).where(Ticket.id == ticket_id)
+        result = await self.session.exec(statement)
+        ticket = result.first()
+
         if ticket:
             ticket.priority = priority
+            self.session.add(ticket)
+            await self.session.commit()
+            await self.session.refresh(ticket)
+
         return ticket
 
-    def delete(self, ticket_id: int) -> bool:
+    async def delete(self, ticket_id: int) -> bool:
         """Delete a ticket.
 
         Args:
@@ -91,29 +146,12 @@ class TicketStorage:
         Returns:
             True if deleted, False if not found
         """
-        if ticket_id in self._tickets:
-            del self._tickets[ticket_id]
+        statement = select(Ticket).where(Ticket.id == ticket_id)
+        result = await self.session.exec(statement)
+        ticket = result.first()
+
+        if ticket:
+            await self.session.delete(ticket)
+            await self.session.commit()
             return True
         return False
-
-    def filter_by_status(self, status: Status) -> List[Ticket]:
-        """Filter tickets by status.
-
-        Args:
-            status: Status to filter by
-
-        Returns:
-            List of tickets with matching status
-        """
-        return [t for t in self._tickets.values() if t.status == status]
-
-    def filter_by_priority(self, priority: Priority) -> List[Ticket]:
-        """Filter tickets by priority.
-
-        Args:
-            priority: Priority to filter by
-
-        Returns:
-            List of tickets with matching priority
-        """
-        return [t for t in self._tickets.values() if t.priority == priority]
