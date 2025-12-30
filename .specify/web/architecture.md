@@ -159,30 +159,30 @@ todo-phase2/
 ## Phase II Features
 
 ### Backend
-- [ ] FastAPI application setup
-- [ ] SQLAlchemy models with Neon PostgreSQL
-- [ ] CRUD API endpoints
-- [ ] Request/response schemas
+- [x] FastAPI application setup
+- [x] SQLAlchemy models with Neon PostgreSQL
+- [x] CRUD API endpoints
+- [x] Request/response schemas
 - [ ] Database migrations with Alembic
-- [ ] CORS configuration
-- [ ] Error handling
-- [ ] API documentation (Swagger UI)
+- [x] CORS configuration
+- [x] Error handling
+- [x] API documentation (Swagger UI)
 
 ### Frontend
-- [ ] Next.js 14+ project setup with App Router
+- [x] Next.js 14+ project setup with App Router
 - [ ] shadcn/ui components setup
-- [ ] Tickets list page with table
+- [x] Tickets list page with table
 - [ ] Create ticket form
 - [ ] Update ticket modal/page
 - [ ] Delete confirmation
 - [ ] Status badge components
 - [ ] Priority badge components
-- [ ] Loading states
-- [ ] Error handling
+- [x] Loading states
+- [x] Error handling
 - [ ] Dark mode support
 
 ### Integration
-- [ ] API client for backend calls
+- [x] API client for backend calls
 - [ ] Form validation (zod)
 - [ ] Optimistic updates
 - [ ] Error toast notifications
