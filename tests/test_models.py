@@ -2,7 +2,7 @@
 
 import pytest
 from pydantic import ValidationError
-from src.models import Ticket, Priority, Status
+from backend.models import Ticket, Priority, Status
 
 
 class TestPriorityEnum:

@@ -1,8 +1,8 @@
 """Demo script to showcase all CLI functionality."""
 
-from src.storage import TicketStorage
-from src.models import Priority, Status
-from src.cli import display_ticket, display_tickets_table
+from backend.storage import TicketStorage
+from backend.models import Priority, Status
+from backend.cli import display_ticket, display_tickets_table
 from rich.console import Console
 
 console = Console()

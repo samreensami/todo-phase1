@@ -1,8 +1,8 @@
 """Tests for ticket storage CRUD operations."""
 
 import pytest
-from src.storage import TicketStorage
-from src.models import Priority, Status
+from backend.storage import TicketStorage
+from backend.models import Priority, Status
 
 
 class TestTicketStorage:

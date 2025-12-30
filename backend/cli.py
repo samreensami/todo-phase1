@@ -7,8 +7,8 @@ from rich.table import Table
 from rich.panel import Panel
 from rich import box
 
-from src.models import Priority, Status
-from src.storage import TicketStorage
+from backend.models import Priority, Status
+from backend.storage import TicketStorage
 
 app = typer.Typer(help="Dev-Ops Ticket Management CLI")
 console = Console()

@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [project.scripts]
-todo = "src.cli:app"
+todo = "backend.cli:app"
 
 [dependency-groups]
 dev = [

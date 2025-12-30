@@ -1,10 +1,14 @@
-# Dev-Ops Ticket Management CLI
+# Dev-Ops Ticket Management
 
+## Phase I: CLI Application
 A Python CLI application for managing tickets in memory.
+
+## Phase II: Full-Stack Web Application (Coming Soon)
+Converting to a full-stack web application with FastAPI backend and Next.js frontend.
 
 ## Features
 
-- **In-memory ticket management** - No persistent storage required
+- **In-memory ticket management** - No persistent storage required (Phase I)
 - **Rich terminal output** - Beautiful, colored CLI interface
 - **Priority levels** - LOW, MED, HIGH
 - **Status tracking** - BACKLOG, DONE
@@ -12,11 +16,23 @@ A Python CLI application for managing tickets in memory.
 
 ## Tech Stack
 
+### Phase I (CLI)
 - Python 3.13
 - uv (package manager)
 - typer (CLI framework)
 - pydantic (data validation)
 - rich (terminal formatting)
+
+### Phase II (Full-Stack)
+**Backend:**
+- FastAPI - High-performance async REST API framework
+- Neon Serverless PostgreSQL - Serverless database
+- SQLAlchemy (async) - Database ORM with Alembic migrations
+
+**Frontend:**
+- Next.js 14+ - React framework with App Router
+- shadcn/ui + Tailwind CSS - Beautiful UI components
+- TypeScript - Type safety
 
 ## Installation
 
@@ -26,48 +42,6 @@ uv sync
 
 # Install development dependencies (for testing)
 uv sync --group dev
-```
-
-## Usage
-
-### Create a ticket
-```bash
-uv run python -m src.main create "Fix login bug"
-uv run python -m src.main create "Add feature" --priority HIGH
-uv run python -m src.main create "Done task" --status DONE
-```
-
-### List tickets
-```bash
-# List all tickets
-uv run python -m src.main list
-
-# Filter by status
-uv run python -m src.main list --status BACKLOG
-uv run python -m src.main list --status DONE
-
-# Filter by priority
-uv run python -m src.main list --priority HIGH
-```
-
-### Get a specific ticket
-```bash
-uv run python -m src.main get 1
-```
-
-### Update ticket status
-```bash
-uv run python -m src.main update-status 1 DONE
-```
-
-### Update ticket priority
-```bash
-uv run python -m src.main update-priority 1 HIGH
-```
-
-### Delete a ticket
-```bash
-uv run python -m src.main delete 1
 ```
 
 ## Quick Demo
@@ -92,7 +66,7 @@ uv run pytest
 uv run pytest -v
 
 # Run tests with coverage report
-uv run pytest --cov=src --cov-report=term-missing
+uv run pytest --cov=backend --cov-report=term-missing
 
 # Run specific test file
 uv run pytest tests/test_models.py
@@ -150,7 +124,7 @@ tests/test_cli.py::TestCLIHelp::test_main_help PASSED
 
 ```
 todo1/
-├── src/
+├── backend/              # Backend (CLI - Phase I)
 │   ├── __init__.py       # Package initialization
 │   ├── models.py         # Pydantic models (Ticket, Priority, Status)
 │   ├── storage.py        # In-memory storage manager
@@ -175,7 +149,7 @@ This project follows the Spec-Driven Development (SDD) approach with requirement
 1. **Install dependencies**: `uv sync --group dev`
 2. **Run tests**: `uv run pytest`
 3. **Run demo**: `uv run python demo.py`
-4. **Use CLI**: `uv run python -m src.main [command]`
+4. **Use CLI**: `uv run python -m backend.main [command]`
 
 ### Key Design Decisions
 

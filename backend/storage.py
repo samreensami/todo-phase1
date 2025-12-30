@@ -1,7 +1,7 @@
 """In-memory ticket storage manager."""
 
 from typing import Dict, List, Optional
-from src.models import Ticket, Priority, Status
+from backend.models import Ticket, Priority, Status
 
 
 class TicketStorage:
